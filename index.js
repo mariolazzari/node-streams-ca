@@ -1,13 +1,54 @@
 const fs = require("fs");
+const { Transform } = require("stream");
+const csv = require("csvtojson");
 
 const FILE_IN = "./data/import.csv";
 const FILE_OUT = "./data/export.csv";
+
+// steam transform
+const myTransform = new Transform({
+  objectMode: true,
+  transform(chunk, env, callback) {
+    const { name, email, age, salary, isActive } = chunk;
+    const user = {
+      name,
+      email: email.toLowerCase(),
+      age: +age,
+      salary: +salary,
+      isActive: isActive === "true",
+    };
+
+    let error = null;
+    if (!name) {
+      error = "Name not found";
+    }
+
+    callback(error, user);
+  },
+});
 
 // solve backp ressure with pipes
 const main = () => {
   const readStream = fs.createReadStream(FILE_IN);
   const writeStream = fs.createWriteStream(FILE_OUT);
-  readStream.pipe(writeStream);
+
+  // pipes chaining
+  readStream
+    // csv 2 json
+    .pipe(csv({ delimiter: ";" }, { objectMode: true }))
+    // transform stream
+    .pipe(myTransform)
+    .on("data", data => {
+      console.log("Data", data);
+    })
+    .on("error", ex => {
+      console.log("Error", ex);
+    })
+    .on("end", () => {
+      console.log("End");
+    });
+  // write stream
+  // .pipe(writeStream);
 
   readStream.on("end", () => {
     console.log("ReadStream End");

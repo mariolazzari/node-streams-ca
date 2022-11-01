@@ -23,5 +23,8 @@
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
     "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "csvtojson": "^2.0.10"
   }
 }
