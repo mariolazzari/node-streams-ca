@@ -3,6 +3,24 @@ const fs = require("fs");
 const FILE_IN = "./data/import.csv";
 const FILE_OUT = "./data/export.csv";
 
+// solve backp ressure with pipes
+const main = () => {
+  const readStream = fs.createReadStream(FILE_IN);
+  const writeStream = fs.createWriteStream(FILE_OUT);
+  readStream.pipe(writeStream);
+
+  readStream.on("end", () => {
+    console.log("ReadStream End");
+  });
+
+  writeStream.on("finish", () => {
+    console.log("WriteStream Finish");
+  });
+};
+main();
+
+// solve back pressure with highWaterMark
+/*
 const main = () => {
   // create readable stream (optional size)
   const readStream = fs.createReadStream(FILE_IN, { highWaterMark: 100 });
@@ -36,5 +54,4 @@ const main = () => {
     console.log("ReadStream End");
   });
 };
-
-main();
+*/
